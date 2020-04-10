@@ -1,0 +1,51 @@
+---
+title: "232_assignment_2"
+author: "Claire Madden"
+date: "4/9/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Assignment Details:
+
+Lobell et al (2006) present several empirical models that related yield of different California crops to climate variables.
+
+1. Implement a model of almond yield anomaly (difference from average) in R based on this paper; You will be graded both on the “correctness” of the implementation and on “style”.  Make sure you add some error checking. Use coefficients in the paper as default values, but make sure you can vary them. 
+
+2. Have the function return almond yield anomaly for each year, and max and minimum yields over a time series of multiple year inputs
+
+3. With the climate data provided (clim.txt), *use your model* to estimate how almond yield anomalies for each year in the record - graph the results.
+
+4. Use model to estimate  the mean annual yield anomaly if the last 20 years had been 2C warmer
+
+5. Vary one of the parameter by sampling from a normal distribution with mean the value from Lobell et al., (2006) and standard deviation 10% of the mean -  create a box plot of  mean annual yield anomaly for baseline and 2C climate (where boxes show variation due to uncertanty in the parameter) 
+
+
+
+Keep your function as a *.R file - and use an Rmarkdown document to show how you used your function to answer 3-5 
+
+Turn both the *.R file and the Rmarkdown document on guachospace
+
+
+
+Extra Credit - write a function that would make it easy to model ANY of the crops in Lobell 
+
+
+
+Turn in on Gauchospace - the .R function, that you used in the project (and to create the help pages) and a text file that gives your answers to questions
+
+
+
+Useful R command -group_by
+
+
+**Hint**
+
+clim_month = clim %>% group_by(month, year) %>% summarize(meantmax = mean(tmax_c), precip=sum(precip)) 
+
+gives average monthly maximum daily temperature, and monthly precipitation from a data frame called clim  with columns year, month, precip and tmax_c
+
+
