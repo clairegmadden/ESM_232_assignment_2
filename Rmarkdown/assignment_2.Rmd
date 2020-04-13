@@ -12,13 +12,30 @@ library(tidyverse)
 library(here)
 
 clim_data <- read_csv(here("Data", "clim.csv"))
+# could change this line to start from .txt
 ```
+
+```{r}
+
+clim_monthly <- clim_data %>% 
+  group_by(month, year) %>% 
+  summarize(meantmax = mean(tmax_c), precip=sum(precip)) %>% 
+  filter(month == 1 | month == 2)
+
+
+```
+
 
 Assignment Details:
 
 Lobell et al (2006) present several empirical models that related yield of different California crops to climate variables.
 
 1. Implement a model of almond yield anomaly (difference from average) in R based on this paper; You will be graded both on the “correctness” of the implementation and on “style”.  Make sure you add some error checking. Use coefficients in the paper as default values, but make sure you can vary them. 
+```{r}
+source("../R/yield_anom.R")
+yield_anom
+
+```
 
 
 
