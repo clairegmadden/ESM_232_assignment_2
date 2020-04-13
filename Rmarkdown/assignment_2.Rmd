@@ -1,6 +1,6 @@
 ---
 title: "232_assignment_2"
-author: "Claire Madden"
+author: "Claire Madden and Lydia Bleifuss"
 date: "4/9/2020"
 output: html_document
 ---
