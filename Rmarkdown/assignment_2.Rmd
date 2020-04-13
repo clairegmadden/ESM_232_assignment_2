@@ -9,8 +9,9 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
+library(here)
 
-clim_data <- read_csv("clim.csv")
+clim_data <- read_csv(here("Data", "clim.csv"))
 ```
 
 Assignment Details:
@@ -18,6 +19,8 @@ Assignment Details:
 Lobell et al (2006) present several empirical models that related yield of different California crops to climate variables.
 
 1. Implement a model of almond yield anomaly (difference from average) in R based on this paper; You will be graded both on the “correctness” of the implementation and on “style”.  Make sure you add some error checking. Use coefficients in the paper as default values, but make sure you can vary them. 
+
+
 
 2. Have the function return almond yield anomaly for each year, and max and minimum yields over a time series of multiple year inputs
 
