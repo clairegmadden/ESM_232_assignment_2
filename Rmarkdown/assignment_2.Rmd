@@ -17,6 +17,15 @@ clim_data <- read_csv(here("Data", "clim.csv"))
 
 ```{r}
 
+# might want to consider how to do this for any climate data that might be input, in case the headers are not the same
+# should just rename all the headers ?
+# add error checking for column headers that are required to run the function
+# check row length of columns to make sure they match 
+
+# use sapply to say (for each year do this thing)
+
+# pick one of the five parameters to vary - it doesn't matter which
+
 clim_monthly <- clim_data %>% 
   group_by(month, year) %>% 
   summarize(meantmax = mean(tmax_c), precip=sum(precip)) %>% 
