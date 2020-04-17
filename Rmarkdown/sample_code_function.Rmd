@@ -9,3 +9,223 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r}
+library(tidyverse)
+library(knitr)
+```
+
+Working with parameters 
+
+```{r solar}
+source("../R/solarpv.R")
+solarpv
+
+# read in R formatted data
+load("../Data/sierraczosolar.rda")
+
+# already in the format required for the model
+head(sierraczosolar)
+
+# run the model
+solarpv(area=0.1, solar=sierraczosolar, clr="green", eunit="W")
+
+# run and save results - but don't plot
+site1 = solarpv(area=0.1, solar=sierraczosolar, clr="green", eunit="W", g=FALSE)
+site1$mean
+
+# consider a different pv array that only uses 
+# diffuse and has non standard efficiency (0.6)
+site2 = solarpv(area=0.1, solar=sierraczosolar, clr="green", eunit="W", g=FALSE, eff=0.6, etype="direct")
+site2$mean
+
+# try some additional variations
+# add an output that is the minimum annual solar output
+# add error checking that would remove years that have less than 12 months of data
+
+```
+
+Nested Functions + Graphing
+
+```{r valuep}
+
+source("../R/compute_NPV.R")
+source("../R/compute_profit_frompower.R")
+
+compute_profit_frompower
+
+compute_NPV
+
+# use solar from  site1 from above as input
+
+profit_solar = compute_profit_frompower(energy=site1$annual$elect, price=30, discount=0.04)
+profit_solar
+
+ggplot(profit_solar$yearprofit, aes(year, netpre))+geom_col()+labs(y="Profit in current $", x="year")
+
+# notice that by graphing we identify an issue with the first year
+# thoughts on what it might be
+```
+
+
+Creating a Sample 
+
+```{r reuse}
+
+# rerun 'sampling' in makingfunction1.Rmd. above to get results from our reserovir model
+source("../R/power_gen.R")
+number_runs = length(profit_solar$year)
+reservoir_model_res= as.data.frame(matrix(nrow=number_runs, ncol=3))
+colnames(reservoir_model_res)=c("height","flowrate","power")
+# STep 2 - generate heights and flow rates
+reservoir_model_res$height = rnorm(mean=10, sd=1, n=number_runs)
+reservoir_model_res$flowrate = runif(min=0.1, max=1, n=number_runs)
+# Step 3 - apply model to get power for each height, flow rate
+reservoir_model_res$power = mapply(FUN=power_gen, height=reservoir_model_res$height, flow=reservoir_model_res$flowrate)
+head(reservoir_model_res)
+
+# create profit from hydro
+profit_hydro = compute_profit_frompower(energy=reservoir_model_res$power, price=30, discount=0.04)
+
+# compare with
+profit_solar = compute_profit_frompower(energy=site1$annual$elect, price=30, discount=0.04)
+
+profit_solar$total/1000
+profit_hydro$total/1000
+
+```
+MORE SAMPLING IN MAKING FUNCTIONS 2
+
+
+
+Catagorical Data
+
+R uses **factors** to deal with categorical data
+and **summary** to get counts (occurence of unique entities)
+
+
+# Lists - For returning more than one item from your function
+
+*Lists are the most “informal” data structures in R
+*List are really useful for keeping track of and organizing groups of things that are not all the same
+*A list could be a table where number of rows is different for each column
+*A list can have numeric, character, factors all mixed together
+* List are often used for returning more complex information from function (e.g. lm)
+
+
+Example: Lets build on our compute_simpson_index, but output some additional information - the most frequent species and the rarest species
+
+useful R
+recall for *factors* , *summary* gives you occurance for each unique factor
+
+we will also look at some other useful commands for lists
+
+* *lapply
+
+```{r usinglists}
+
+
+
+
+# use of summary with factos
+flower_types = c("iris","daisy","poppy","rose","dandelion","weed","violet")
+# sample (with replacement)
+garden = sample(flower_types, size=20, replace=T)
+
+# get frequencies
+summary(as.factor(garden))
+
+# find most frequent factor
+which.max(summary(as.factor(garden)))
+
+# get the label/name of least frequent factor
+names(which.min(summary(as.factor(garden))))
+
+
+# use these to inclue in our function and return more # information
+
+source("../R/compute_diversity.R")
+
+compute_diversity
+
+compute_simpson_index(garden)
+compute_diversity(garden)
+
+# modify to also output least frequent species and total number of unique speceis and add some error checking!
+
+# a bit more on using functions for multiple values
+# generate data for multiple gardens in multiple sites
+
+# with lists can mix arrays and single values
+site = c("A","B","C","D","E")
+
+# generate sample data
+nflowers=20
+garden_sample = sapply(site, function(x) {flowers = sample(flower_types, size=nflowers, replace=T); return(flowers)})
+
+# or with a for loop
+garden_sample = matrix(nrow=nflowers, ncol=length(site))
+for (j in 1:length(site)) {
+  garden_sample[,j] = sample(flower_types, size=nflowers, replace=T)
+}
+
+# example application of our function to a specific garden
+compute_diversity(garden_sample[,2])
+
+# now generate a data frame to store our results for all gardens
+# recall for each garden we now have multiple things returned
+# a) the simpson index and b) the most frequent species
+
+
+many_garden_result = data.frame(site = c("A","B","C","D","E"), simpson=NA, mostfreq=NA)
+
+many_garden_result
+for (i in 1:length(site)) {
+  tmp = compute_diversity(garden_sample[,i])
+  many_garden_result$simpson[i]=tmp$simpson
+  many_garden_result$mostfreq[i]=tmp$mostfreq
+}
+many_garden_result
+
+# alteratively - a bit cleaner but runs function twice
+for (i in 1:length(site)) {
+   many_garden_result$simpson[i]=compute_diversity(garden_sample[,i])$simpson
+  many_garden_result$mostfreq[i]=compute_diversity(garden_sample[,i])$mostfreq
+}
+
+head(many_garden_result)
+ggplot(many_garden_result, aes(site, simpson, fill=mostfreq))+geom_col()
+
+# we could also use apply to run our model over all of our sites
+# apply lets you run for each column
+# it will result in list
+# advantage is you don't need to define the data structure
+# disadvantage lists are hard to deal with
+
+many_gardens_result_aslist = apply(garden_sample, 2, function(x) {diversity= compute_diversity(x); return(diversity)})
+
+head(many_gardens_result_aslist)
+
+# look at an individual garden (element of list)
+many_gardens_result_aslist[3]
+# all named items
+lapply(many_gardens_result_aslist,"[", c("simpson"))
+
+# often easier to get it out of list format
+# organize list by columns and convert to dataframe
+many_gardens_result_aslist[1]
+# note that each element of the list has 2 items- so store as a matrix with 2 columns one for each item - and use unlist to extract
+
+many_gardens_sum = as.data.frame(matrix(unlist(many_gardens_result_aslist), ncol=2, byrow=T))
+colnames(many_gardens_sum)=c("simpson","mostfreq")
+# add site name
+many_gardens_sum$site = site
+
+
+#plot
+ggplot(many_gardens_sum, aes(site, simpson, fill=mostfreq))+geom_col()+labs(y="Simpson Index", x="Site")
+
+#try adding least frequent species and total number of species to the function
+
+```
+
+
