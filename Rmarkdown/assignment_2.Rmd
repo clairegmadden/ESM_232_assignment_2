@@ -31,6 +31,14 @@ clim_monthly <- clim_data %>%
   summarize(meantmax = mean(tmax_c), precip=sum(precip)) %>% 
   filter(month == 1 | month == 2)
 
+ precip_2 <- clim_monthly %>% 
+    select(!meantmax) %>% 
+   filter(month == 2)
+ 
+   temp_1 <- clim_monthly %>% 
+    select(!precip) %>% 
+    filter(month == 1)
+
 
 ```
 
