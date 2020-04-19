@@ -58,6 +58,7 @@ yield_anom_list <- yield_anom(clim_data = clim_data)
 ```{r}
 # first need to change the function output to a dataframe so we can graph it
 
+yield_anom_df <- data.frame(yield_anom_list[1])
 
 
 
@@ -66,7 +67,15 @@ yield_anom_list <- yield_anom(clim_data = clim_data)
 
 
 
-4. Use model to estimate  the mean annual yield anomaly if the last 20 years had been 2C warmer
+4. Use model to estimate the mean annual yield anomaly if the last 20 years had been 2C warmer
+
+```{r}
+
+
+
+
+```
+
 
 
 
