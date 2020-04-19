@@ -61,10 +61,26 @@ yield_anom_list <- yield_anom(clim_data = clim_data)
 yield_anom_df <- data.frame(yield_anom_list[1])
 
 
-
-
 ```
 
+
+```{r}
+yield_anom_1 <- ggplot(data = yield_anom_df, 
+       aes(x = year, y = y_anom, fill = "darksalmon")) +
+  geom_col(width = 0.5, show.legend = FALSE, alpha = 0.8) +
+  theme_classic() +
+   ggtitle("Yield Anom (1989 - 2010)\n") +
+  xlab("\nYear") +
+  ylab("Yield (tons/acre)") +
+  theme(plot.title = element_text(size=12)) +
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  scale_x_continuous(expand = c(0,0), limits = c(1989,2010)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_y_continuous(expand = c(0,0)) +
+    labs(caption = "\nFigure 1. Caption.") 
+
+yield_anom_1
+```
 
 
 4. Use model to estimate the mean annual yield anomaly if the last 20 years had been 2C warmer
