@@ -16,9 +16,7 @@ yield_anom = function(tn1 = -0.015, tn2 = -0.0046, p1 = -0.07, p2 = 0.0043, int 
   
   clim_monthly <- clim_data %>% 
   group_by(month, year) %>% 
-  mutate(tmin_2c = (tmin_c+2)) %>% 
   summarize(meantmin = mean(tmin_c),
-            meantmin_2c = mean(tmin_2c),
             precip=mean(precip)) %>%  #maybe check if this is supposed to be mean rather than sum (slack notes)  
     ungroup()
   
@@ -32,9 +30,6 @@ yield_anom = function(tn1 = -0.015, tn2 = -0.0046, p1 = -0.07, p2 = 0.0043, int 
   select(-precip, -meantmin_2c) %>% 
   filter(month == 1)
   
-  temp_2c <- clim_monthly %>% 
-    select(-precip,-meantmin) %>% 
-    filter(month == 1)
     
   df_anom <- data.frame(year = temp_1$year, y_anom = NA) 
   
