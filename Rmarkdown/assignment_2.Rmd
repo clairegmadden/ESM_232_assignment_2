@@ -26,18 +26,7 @@ clim_data <- read_csv(here("Data", "clim.csv"))
 
 # pick one of the five parameters to vary - it doesn't matter which
 
-clim_monthly <- clim_data %>% 
-  group_by(month, year) %>% 
-  summarize(meantmax = mean(tmax_c), precip=sum(precip)) %>% 
-  filter(month == 1 | month == 2)
 
- precip_2 <- clim_monthly %>% 
-    select(!meantmax) %>% 
-   filter(month == 2)
- 
-   temp_1 <- clim_monthly %>% 
-    select(!precip) %>% 
-    filter(month == 1)
 
 
 ```
@@ -47,21 +36,33 @@ Assignment Details:
 
 Lobell et al (2006) present several empirical models that related yield of different California crops to climate variables.
 
-1. Implement a model of almond yield anomaly (difference from average) in R based on this paper; You will be graded both on the “correctness” of the implementation and on “style”.  Make sure you add some error checking. Use coefficients in the paper as default values, but make sure you can vary them. 
+1. Implement a model of almond yield anomaly (difference from average) in R based on this paper; You will be graded both on the “correctness” of the implementation and on “style”.  **Make sure you add some error checking.** Use coefficients in the paper as default values, but make sure you can vary them. 
+
+- see .R doc, still need to add error checking
+
+2. Have the function return almond yield anomaly for each year, and max and minimum yields over a time series of multiple year inputs
+
 ```{r}
 
+# use function to return list of yield anomolies and the max and min anomoly over the time series
+
 source("../R/yield_anom.R")
-yield_anom
+yield_anom_list <- yield_anom(clim_data = clim_data)
 
 ```
 
 
 
-2. Have the function return almond yield anomaly for each year, and max and minimum yields over a time series of multiple year inputs
-
-
-
 3. With the climate data provided (clim.txt), *use your model* to estimate how almond yield anomalies for each year in the record - graph the results.
+
+```{r}
+# first need to change the function output to a dataframe so we can graph it
+
+
+
+
+
+```
 
 
 
