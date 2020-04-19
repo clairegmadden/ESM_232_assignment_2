@@ -16,21 +16,30 @@ yield_anom = function(tn1 = -0.015, tn2 = -0.0046, p1 = -0.07, p2 = 0.0043, int 
   
   clim_monthly <- clim_data %>% 
   group_by(month, year) %>% 
-  summarize(meantmin = mean(tmin_c), 
+  mutate(tmin_2c = (tmin_c+2)) %>% 
+  summarize(meantmin = mean(tmin_c),
+            meantmin_2c = mean(tmin_2c),
             precip=mean(precip)) %>%  #maybe check if this is supposed to be mean rather than sum (slack notes)  
     ungroup()
   
+  clim_monthly$precip = ifelse(clim_monthly$precip < 0, return("Precipitation cannot be less than zero"), clim_monthly$precip)
+  
   precip_2 <- clim_monthly %>% 
-  select(-meantmin) %>% 
+  select(-meantmin, - meantmin_2c) %>% 
   filter(month == 2)
   
   temp_1 <- clim_monthly %>% 
-  select(-precip) %>% 
+  select(-precip, -meantmin_2c) %>% 
   filter(month == 1)
+  
+  temp_2c <- clim_monthly %>% 
+    select(-precip,-meantmin) %>% 
+    filter(month == 1)
     
   df_anom <- data.frame(year = temp_1$year, y_anom = NA) 
   
-  for(i in 1:nrow(df_anom)) {
+  
+    for(i in 1:nrow(df_anom)) {
     
   df_anom$y_anom[i] <- tn1*temp_1$meantmin[i] + 
     tn2*temp_1$meantmin[i]^2 + 
@@ -39,6 +48,8 @@ yield_anom = function(tn1 = -0.015, tn2 = -0.0046, p1 = -0.07, p2 = 0.0043, int 
     int
     
   }
+  
+
   
   y_anom_yr <- dplyr::select(df_anom, c(year,y_anom))
   
