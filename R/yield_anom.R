@@ -7,7 +7,7 @@
 # tx is the maximum temperature (t) of the month(x)
 # p is precip
 
-#add error checking for year, month etc how things are labled in toehr climate data 
+#Add error checking for to ensure climate data is reasonable 
 
 # function in paper : Y = -0.015tn,2 - 0.0046t(^2)n,2 - 0.07P1 + 0.0043P(^2)1 +0.28
 
@@ -17,10 +17,10 @@ yield_anom = function(tn1 = -0.015, tn2 = -0.0046, p1 = -0.07, p2 = 0.0043, int 
   clim_monthly <- clim_data %>% 
   group_by(month, year) %>% 
   summarize(meantmin = mean(tmin_c),
-            precip=mean(precip)) %>%  #maybe check if this is supposed to be mean rather than sum (slack notes)  
+            precip=mean(precip)) %>%  #Checked the paper, mean is meant to be used in this context 
     ungroup()
   
-  clim_monthly$precip = ifelse(clim_monthly$precip < 0, return("Precipitation cannot be less than zero"), clim_monthly$precip)
+  clim_monthly$precip = ifelse(clim_monthly$precip < 0, return("Precipitation cannot be less than zero"), clim_monthly$precip) #Error checking to ensure precip is reasonable 
   
   precip_2 <- clim_monthly %>% 
   select(-meantmin) %>% 
@@ -31,10 +31,10 @@ yield_anom = function(tn1 = -0.015, tn2 = -0.0046, p1 = -0.07, p2 = 0.0043, int 
   filter(month == 1)
   
     
-  df_anom <- data.frame(year = temp_1$year, y_anom = NA) 
+  df_anom <- data.frame(year = temp_1$year, y_anom = NA) #Creating a dataframe to populate 
   
   
-    for(i in 1:nrow(df_anom)) {
+    for(i in 1:nrow(df_anom)) { #Creating a 4 loop to populate the yield anom 
     
   df_anom$y_anom[i] <- tn1*temp_1$meantmin[i] + 
     tn2*temp_1$meantmin[i]^2 + 

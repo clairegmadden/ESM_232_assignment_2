@@ -1,6 +1,6 @@
 
 
-# to calculate yield anomaly with 2c warming
+# To calculate yield anomaly with 2c warming
 
 
 yield_anom_2c = function(tn1 = -0.015, tn2 = -0.0046, p1 = -0.07, p2 = 0.0043, int = 0.28, clim_data) {
@@ -8,10 +8,10 @@ yield_anom_2c = function(tn1 = -0.015, tn2 = -0.0046, p1 = -0.07, p2 = 0.0043, i
   clim_monthly <- clim_data %>% 
     group_by(month, year) %>% 
     summarize(meantmin_2c = mean(tmin_c+2),
-              precip=mean(precip)) %>%  #maybe check if this is supposed to be mean rather than sum (slack notes)  
+              precip=mean(precip)) %>%  #Checked the paper, mean is meant to be used in this context  
     ungroup()
   
-  clim_monthly$precip = ifelse(clim_monthly$precip < 0, return("Precipitation cannot be less than zero"), clim_monthly$precip)
+  clim_monthly$precip = ifelse(clim_monthly$precip < 0, return("Precipitation cannot be less than zero"), clim_monthly$precip) #Error checking to ensure precip is reasonable 
   
   precip_2 <- clim_monthly %>% 
     select(-meantmin_2c) %>% 
@@ -22,10 +22,10 @@ yield_anom_2c = function(tn1 = -0.015, tn2 = -0.0046, p1 = -0.07, p2 = 0.0043, i
     filter(month == 1)
 
   
-  df_anom_2c <- data.frame(year = temp_1$year, y_anom_2c = NA) 
+  df_anom_2c <- data.frame(year = temp_1$year, y_anom_2c = NA) #Creating a dataframe to populate 
   
   
-  for(i in 1:nrow(df_anom_2c)) {
+  for(i in 1:nrow(df_anom_2c)) { #Creating a 4 loop to populate the yield anom 
     
     df_anom_2c$y_anom_2c[i] <- tn1*temp_1$meantmin_2c[i] + 
       tn2*temp_1$meantmin_2c[i]^2 + 

@@ -146,7 +146,7 @@ yield_anom_2
 
 ```{r}
 
-param = rnorm(22, -0.0046, sd=0.1)
+param = rnorm(22, -0.0046, sd=0.1) #Varying a temperature param 
 param_df = as.data.frame(param)
 
 
@@ -166,9 +166,9 @@ tn2_anom_df1 <- data.frame(tn2_anom[1]) %>%
 
 tn2_anom_df2 <- data.frame(tn2_anom_2c[1]) %>% 
   mutate(scenario = "2 degrees warmer") %>% 
-  rename(y_anom = y_anom_2c)
+  rename(y_anom = y_anom_2c) #Renaming to merge 
 
-tn2_anom_merge <- rbind(tn2_anom_df1, tn2_anom_df2)
+tn2_anom_merge <- rbind(tn2_anom_df1, tn2_anom_df2) #Merging the datasets for easier graphing 
   
   
 ```
@@ -186,7 +186,7 @@ tn2_box <- ggplot(data = tn2_anom_merge, aes(y = y_anom, x = year, fill = scenar
 theme(plot.title = element_text(hjust = 0.5))+
  theme(legend.title = element_text(size=10), legend.position = "right")
 
-tn2_box
+tn2_box #Contrasting param variations between historical and +2c
 
 ```
 
@@ -195,12 +195,4 @@ tn2_box
 Keep your function as a *.R file - and use an Rmarkdown document to show how you used your function to answer 3-5 
 
 Turn both the *.R file and the Rmarkdown document on guachospace
-
-
-
-Extra Credit - write a function that would make it easy to model ANY of the crops in Lobell 
-
-
-
-Turn in on Gauchospace - the .R function, that you used in the project (and to create the help pages) and a text file that gives your answers to questions
 
