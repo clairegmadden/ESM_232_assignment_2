@@ -29,13 +29,9 @@ clim_data <- read_csv(here("Data", "clim.csv"))
 ```
 
 
-Assignment Details:
-
-Lobell et al (2006) present several empirical models that related yield of different California crops to climate variables.
-
 1. Implement a model of almond yield anomaly (difference from average) in R based on this paper; You will be graded both on the “correctness” of the implementation and on “style”.  **Make sure you add some error checking.** Use coefficients in the paper as default values, but make sure you can vary them. 
 
-- see .R doc, still need to add error checking
+- see .R doc
 
 2. Have the function return almond yield anomaly for each year, and max and minimum yields over a time series of multiple year inputs
 
@@ -55,16 +51,16 @@ yield_anom_list <- yield_anom(clim_data = clim_data)
 ```{r}
 # first need to change the function output to a dataframe so we can graph it
 
-yield_anom_df <- data.frame(yield_anom_list[1])
+yield_anom_df <- data.frame(yield_anom_list[1]) %>% 
+  mutate(scenario = "baseline")
 
 
 ```
 
 
 ```{r}
-yield_anom_1 <- ggplot(data = yield_anom_df, 
-       aes(x = year, y = y_anom, fill = "darksalmon")) +
-  geom_col(width = 0.5, show.legend = FALSE, alpha = 0.8) +
+yield_anom_1 <- ggplot(data = yield_anom_df, aes(x = year, y = y_anom)) +
+  geom_col(fill = "peru", width = 0.5, show.legend = FALSE, alpha = 0.8) +
   theme_classic() +
    ggtitle("Yield Anom (1989 - 2010)\n") +
   xlab("\nYear") +
@@ -82,39 +78,70 @@ yield_anom_1
 
 4. Use model to estimate the mean annual yield anomaly if the last 20 years had been 2C warmer
 
+
 ```{r}
 
 source("../R/yield_anom_2c.R")
 
 yield_anom_list2 <- yield_anom_2c(clim_data = clim_data)
 
-yield_anom_df2 <- data.frame(yield_anom_list2[1])
+yield_anom_df2 <- data.frame(yield_anom_list2[1]) %>% 
+  mutate(scenario = "2 degrees warmer") %>% 
+  rename(y_anom = y_anom_2c)
 
 
+mean_anom <- mean(yield_anom_df$y_anom)
+mean_anom_2c <- mean(yield_anom_df2$y_anom)
 ```
+
+
+The mean annual yield anomaly under the baseline conditions = `r mean_anom`. 
+If the last 20 years had been 2 degrees warmer, the mean annual yield anomaly = `r mean_anom_2c`
+
+
 
 ```{r}
 
-yield_anom_2 <- ggplot()+
-  geom_col(data = yield_anom_df, aes(x = year, y = y_anom, fill = "Historic Temp"), position = "dodge", width = 0.5, alpha = 0.8) +
-  geom_col(data = yield_anom_df2, aes(x = year, y = y_anom_2c, fill = "2c Warmer"), position = "dodge", width = 0.5, alpha = 0.8) +
+#combine yield anom for baseline and 2deg warmer into single df
+yield_anom_merge <- rbind(yield_anom_df, yield_anom_df2)
+
+# graph the results of both on single column graph
+yield_anom_2 <- ggplot(data = yield_anom_merge, aes(x = year, y = y_anom))+
+  geom_col(aes(fill = scenario),position = "dodge", width = 0.5, alpha = 0.8) +
   theme_classic() +
-   ggtitle("Yield Anom (1989 - 2010)\n") +
+   ggtitle("Almond Yield Anomalies (1989 - 2010)\n") +
   xlab("\nYear") +
   ylab("Yield (tons/acre)") +
   theme(plot.title = element_text(size=12)) +
   theme(plot.title = element_text(hjust = 0.5)) + 
-  scale_x_continuous(expand = c(0,0), limits = c(1989,2010)) +
+  scale_x_continuous(expand = c(0,0), limits = c(1988,2011)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   scale_y_continuous(expand = c(0,0)) +
-    labs(caption = "\nFigure 1. Caption.") 
+  labs(caption = "\nFigure 1. Calculated almond yield anomalies based on climate\n variables temperature and precipitation under a baseline \nscenario and under a scenario of temperature being \n2 degrees C warmer for the years 1989 - 2010.") 
 
 yield_anom_2
 ```
 
 
-
 5. Vary one of the parameter by sampling from a normal distribution with mean the value from Lobell et al., (2006) and standard deviation 10% of the mean -  create a box plot of  mean annual yield anomaly for baseline and 2C climate (where boxes show variation due to uncertanty in the parameter) 
+
+```{r}
+# trying to have a range of tn2 for each year and apply that in functions, not working for me
+# 
+# param_tn2 = rnorm(10, -0.0046, sd = 0.1)
+# 
+# 
+# for(i in 1:length(param_tn2)){
+# 
+#   var_anom <- yield_anom(clim_data=clim_data, tn2 = param_tn2[i])
+#   var_mean <- mean(data.frame((var_anom[[1]])$y_anom))
+# 
+#   var_anom_2c <- yield_anom_2c(clim_data=clim_data, tn2 = param_tn2[i])
+#   var_2c_mean <- mean(data.frame((var_anom_2c[[1]])$y_anom_2c))
+# 
+# }
+
+```
 
 
 ```{r}
@@ -135,10 +162,10 @@ for(i in 1:length(param)){
 
 ```{r}
 tn2_anom_df1 <- data.frame(tn2_anom[1]) %>% 
-  mutate(scen = 1)
+  mutate(scenario = "baseline")
 
 tn2_anom_df2 <- data.frame(tn2_anom_2c[1]) %>% 
-  mutate(scen = 2) %>% 
+  mutate(scenario = "2 degrees warmer") %>% 
   rename(y_anom = y_anom_2c)
 
 tn2_anom_merge <- rbind(tn2_anom_df1, tn2_anom_df2)
@@ -149,19 +176,15 @@ tn2_anom_merge <- rbind(tn2_anom_df1, tn2_anom_df2)
 
 ```{r}
 
-tn2_box <- ggplot(data = tn2_anom_merge, aes(y = y_anom, x = year, fill = scen)) +
-  geom_boxplot(aes(fill = scen)) +
-  geom_point(aes(color = scen), size = 3, alpha = 0.6) +
+tn2_box <- ggplot(data = tn2_anom_merge, aes(y = y_anom, x = year, fill = scenario)) +
+  geom_boxplot(aes(fill = scenario)) +
+  geom_point(aes(color = scenario), size = 3, alpha = 0.6) +
   theme_classic() +
-  #ggtitle("Cachuma Water Storage and Historical Santa Cruz Inflow \nRainy Season Relationship (1999 - 2017)\n") +
   xlab("Year\n") +
-  ylab("Yield") + 
+  ylab("Yield Anomaly") + 
   theme(plot.title = element_text(size=10)) +
 theme(plot.title = element_text(hjust = 0.5))+
- theme(legend.title = element_text(size=10), legend.position = "right") #+
-#scale_y_continuous(expand = c(0,0), limits = c(-2,102)) +
- # scale_x_continuous(limits = c(1999,2020)) +
-  #guides(color=guide_legend("Anom"))
+ theme(legend.title = element_text(size=10), legend.position = "right")
 
 tn2_box
 
@@ -180,16 +203,4 @@ Extra Credit - write a function that would make it easy to model ANY of the crop
 
 
 Turn in on Gauchospace - the .R function, that you used in the project (and to create the help pages) and a text file that gives your answers to questions
-
-
-
-Useful R command -group_by
-
-
-**Hint**
-
-clim_month = clim %>% group_by(month, year) %>% summarize(meantmax = mean(tmax_c), precip=sum(precip)) 
-
-gives average monthly maximum daily temperature, and monthly precipitation from a data frame called clim  with columns year, month, precip and tmax_c
-
 
