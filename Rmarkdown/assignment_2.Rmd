@@ -26,9 +26,6 @@ clim_data <- read_csv(here("Data", "clim.csv"))
 
 # pick one of the five parameters to vary - it doesn't matter which
 
-
-
-
 ```
 
 
@@ -122,6 +119,51 @@ yield_anom_2
 
 ```{r}
 
+param = rnorm(22, -0.0046, sd=0.1)
+param_df = as.data.frame(param)
+
+
+for(i in 1:length(param)){
+  
+  tn2_anom <- yield_anom(clim_data=clim_data, tn2 = param[i])
+  
+  tn2_anom_2c <- yield_anom_2c(clim_data=clim_data, tn2 = param[i])
+  
+}
+
+```
+
+```{r}
+tn2_anom_df1 <- data.frame(tn2_anom[1]) %>% 
+  mutate(scen = 1)
+
+tn2_anom_df2 <- data.frame(tn2_anom_2c[1]) %>% 
+  mutate(scen = 2) %>% 
+  rename(y_anom = y_anom_2c)
+
+tn2_anom_merge <- rbind(tn2_anom_df1, tn2_anom_df2)
+  
+  
+```
+
+
+```{r}
+
+tn2_box <- ggplot(data = tn2_anom_merge, aes(y = y_anom, x = year, fill = scen)) +
+  geom_boxplot(aes(fill = scen)) +
+  geom_point(aes(color = scen), size = 3, alpha = 0.6) +
+  theme_classic() +
+  #ggtitle("Cachuma Water Storage and Historical Santa Cruz Inflow \nRainy Season Relationship (1999 - 2017)\n") +
+  xlab("Year\n") +
+  ylab("Yield") + 
+  theme(plot.title = element_text(size=10)) +
+theme(plot.title = element_text(hjust = 0.5))+
+ theme(legend.title = element_text(size=10), legend.position = "right") #+
+#scale_y_continuous(expand = c(0,0), limits = c(-2,102)) +
+ # scale_x_continuous(limits = c(1999,2020)) +
+  #guides(color=guide_legend("Anom"))
+
+tn2_box
 
 ```
 
